@@ -1,11 +1,12 @@
 !##############################################################################
 !# ****************************************************************************
-!# <name> poisson_method3 </name>
+!# <name> codire_method3 </name>
 !# ****************************************************************************
 !#
 !# <purpose>
-!# This module is a demonstation program how to solve a simple Laplace
-!# problem with constant coefficients on a simple domain.
+!# This module is a demonstation program how to solve a simple 
+!# Convection-Diffusion-Reaction problem with constant coefficients 
+!# on a simple domain.
 !#
 !# The routine splits up the tasks of reading the domain, creating 
 !# triangulations, discretisation, solving, postprocessing and creanup into
@@ -13,10 +14,13 @@
 !# is done using an application-specific structure saving problem data
 !# as well as a collection structure for the communication with callback
 !# routines.
+!#
+!# On start of the routine, a data file 'data/codire.dat' is read from
+!# disc. The parameters in this file configure the problem to solve.
 !# </purpose>
 !##############################################################################
 
-MODULE poisson_method3
+MODULE codire_method3
 
   USE fsystem
   USE storage
@@ -32,8 +36,9 @@ MODULE poisson_method3
   USE spatialdiscretisation
   
   USE collection
+  USE paramlist
     
-  USE poisson_callback
+  USE codire_callback
   
   IMPLICIT NONE
   
@@ -208,7 +213,7 @@ CONTAINS
 
 !<subroutine>
 
-  SUBROUTINE pm2_initMatVec (rproblem,rcollection)
+  SUBROUTINE pm2_initMatVec (rproblem,rcollection,rparams)
   
 !<description>
   ! Calculates the system matrix and RHS vector of the linear system
@@ -224,6 +229,9 @@ CONTAINS
   ! A collection object for saving structural data and some problem-dependent 
   ! information.
   TYPE(t_collection), INTENT(INOUT) :: rcollection
+  
+  ! A parameter list with informations from the DAT file.
+  TYPE(t_parlist), INTENT(IN) :: rparams
 !</inputoutput>
 
   ! local variables
@@ -238,6 +246,10 @@ CONTAINS
 
     ! A pointer to the discretisation structure with the data.
     TYPE(t_spatialDiscretisation), POINTER :: p_rdiscretisation
+    
+    ! Parameters from the DAT file
+    REAL(DP) :: alpha11,alpha12,alpha21,alpha22,beta1,beta2,gamma
+    CHARACTER(LEN=10) :: Sstr
   
     ! Ask the problem structure to give us the discretisation structure
     p_rdiscretisation => rproblem%RlevelInfo(1)%p_rdiscretisation
@@ -267,18 +279,60 @@ CONTAINS
     ! We specify the bilinear form (grad Psi_j, grad Phi_i) for the
     ! scalar system matrix in 2D.
     
-    rform%itermCount = 2
+    rform%itermCount = 7
+    
+    ! alpha * Laplace(u)
     rform%Idescriptors(1,1) = DER_DERIV_X
     rform%Idescriptors(2,1) = DER_DERIV_X
+    
     rform%Idescriptors(1,2) = DER_DERIV_Y
-    rform%Idescriptors(2,2) = DER_DERIV_Y
+    rform%Idescriptors(2,2) = DER_DERIV_X
+    
+    rform%Idescriptors(1,3) = DER_DERIV_X
+    rform%Idescriptors(2,3) = DER_DERIV_Y
+    
+    rform%Idescriptors(1,4) = DER_DERIV_Y
+    rform%Idescriptors(2,4) = DER_DERIV_Y
+    
+    ! (beta1, beta2)^T * grad(u)
+    rform%Idescriptors(1,5) = DER_FUNC
+    rform%Idescriptors(2,5) = DER_DERIV_X
+    
+    rform%Idescriptors(1,6) = DER_FUNC
+    rform%Idescriptors(2,6) = DER_DERIV_Y
+    
+    ! gamma * u
+    rform%Idescriptors(1,7) = DER_FUNC       
+    rform%Idescriptors(2,7) = DER_FUNC
 
     ! In the standard case, we have constant coefficients:
     rform%ballCoeffConstant = .TRUE.
     rform%BconstantCoeff = .TRUE.
-    rform%Dcoefficients(1)  = 1.0 
-    rform%Dcoefficients(2)  = 1.0 
-
+    
+    ! get the coefficients from the parameter list
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'ALPHA11', Sstr, '1.0')
+    READ(Sstr,*) alpha11
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'ALPHA12', Sstr, '0.0')
+    READ(Sstr,*) alpha12
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'ALPHA21', Sstr, '0.0')
+    READ(Sstr,*) alpha21
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'ALPHA22', Sstr, '1.0')
+    READ(Sstr,*) alpha22
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'BETA1', Sstr, '0.0')
+    READ(Sstr,*) beta1
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'BETA2', Sstr, '0.0')
+    READ(Sstr,*) beta2
+    CALL parlst_getvalue_string (rparams, 'EQUATION', 'GAMMA', Sstr, '0.0')
+    READ(Sstr,*) gamma
+    
+    rform%Dcoefficients(1)  = alpha11
+    rform%Dcoefficients(2)  = alpha12
+    rform%Dcoefficients(3)  = alpha21
+    rform%Dcoefficients(4)  = alpha22
+    rform%Dcoefficients(5)  = beta1
+    rform%Dcoefficients(6)  = beta2
+    rform%Dcoefficients(7)  = gamma
+    
     ! Now we can build the matrix entries.
     ! We specify the callback function coeff_Laplace for the coefficients.
     ! As long as we use constant coefficients, this routine is not used.
@@ -561,7 +615,7 @@ CONTAINS
     ! An array for the system matrix(matrices) during the initialisation of
     ! the linear solver.
     TYPE(t_matrixBlock), DIMENSION(1) :: Rmatrices
-
+    
     ! Get our matrix and right hand side from the problem structure.
     p_rrhs    => rproblem%RlevelInfo(1)%rrhs   
     p_rvector => rproblem%RlevelInfo(1)%rvector
@@ -799,13 +853,13 @@ CONTAINS
 
 !<subroutine>
 
-  SUBROUTINE poisson3
+  SUBROUTINE codire3
   
   include 'cmem.inc'
   
 !<description>
-  ! This is a 'separated' poisson solver for solving a Poisson
-  ! problem. The different tasks of the problem are separated into
+  ! This is a 'separated' CoDiRe solver for solving a convection-diffusion-
+  ! reaction problem. The different tasks of the problem are separated into
   ! subroutines. The problem uses a problem-specific structure for the 
   ! communication: All subroutines add their generated information to the
   ! structure, so that the other subroutines can work with them.
@@ -824,6 +878,9 @@ CONTAINS
   ! 7.) Write solution to GMV file
   ! 8.) Release all variables, finish
 
+    ! A paramlist structure with parameters from the dat file
+    TYPE(t_parlist) :: rparams
+
     ! LV receives the level where we want to solve
     INTEGER :: LV
     
@@ -833,20 +890,32 @@ CONTAINS
     ! A collection structure for our problem
     TYPE(t_collection) :: rcollection
     
-    ! Ok, let's start. 
-    ! We want to solve our Laplace problem on level...
-
-    LV = 7
+    ! A temporary string
+    CHARACTER(LEN=10) :: Sstr
     
+    ! Ok, let's start. 
     ! Initialise the collection.
     CALL collct_init (rcollection)
+    
+    ! Initialise the parameter list
+    CALL parlst_init(rparams)
+    
+    ! Read the parameters from disc and put a reference to it
+    ! to the collection
+    CALL parlst_readfromfile(rparams, 'data/codire.dat')
+    CALL collct_setvalue_parlst (rcollection, 'PARAMS', rparams, .TRUE.)
 
+    ! We want to solve our Laplace problem on level...
+
+    CALL parlst_getvalue_string (rparams, 'GENERAL', 'NLMAX', Sstr, '7')
+    READ(Sstr,*) LV
+    
     ! So now the different steps - one after the other.
     !
     ! Initialisation
     CALL pm2_initParamTriang (LV,rproblem)
     CALL pm2_initDiscretisation (rproblem)    
-    CALL pm2_initMatVec (rproblem,rcollection)    
+    CALL pm2_initMatVec (rproblem,rcollection,rparams)    
     CALL pm2_initAnalyticBC (rproblem)   
     CALL pm2_initDiscreteBC (rproblem,rcollection)
     
@@ -864,6 +933,10 @@ CONTAINS
     CALL pm2_doneBC (rproblem)
     CALL pm2_doneDiscretisation (rproblem)
     CALL pm2_doneParamTriang (rproblem)
+    
+    ! Release parameter list
+    CALL collct_deletevalue (rcollection,'PARAMS')
+    CALL parlst_done (rparams)
 
     ! Print some statistical data about the collection - anything forgotten?
     PRINT *
