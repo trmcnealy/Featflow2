@@ -1,0 +1,35 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                          Convection of a step function                       #
+#                                                                              #
+# 1) Constant velocity and final time T=0.5                                    #
+#                                                                              #
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = if(x>=0.2 & x<=0.4 & y>=0.2 & y<=0.4,1,0) ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol_func   = if(x>=0.2+t & x<=0.4+t & y>=0.2+t & y<=0.4+t,1,0) ; x,y,t
+deffunc: @exactsol_derivx = 0 ; x,y,t
+deffunc: @exactsol_derivy = 0 ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 1.0 ; x,y,t
+deffunc: @velocity_y = 1.0 ; x,y,t
+
+# Specify the flux boundary conditions for the primal problem
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+1
+IBCT
+1
+NCOMP
+1
+PARAMETERS
+4.0  F  'FLUX_WEAK'  0.0

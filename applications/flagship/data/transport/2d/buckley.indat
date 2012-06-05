@@ -1,0 +1,30 @@
+# -*- mode: any-ini; -*-
+#
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                          Buckley-Leverett in space-time                      #
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = if( x<=0.5, 1.0, 0.0) ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 1.0 ; x,y,t
+deffunc: @velocity_y = 1.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+1
+IBCT
+1
+NCOMP
+4
+PARAMETERS
+0.25 T  'FLUX_WEAK'  1.0
+1.0  T  'FLUX_WEAK'  0.0
+3.0  F  'FLUX_WEAK'  0.0
+4.0  T  'FLUX_WEAK'  1.0

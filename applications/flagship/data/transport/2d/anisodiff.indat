@@ -1,0 +1,236 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                              Anisotropic diffusion                           #
+#                                                                              #
+#  From:   D. Kuzmin, M. Shashkov, D.A. Svyatskiy. A constrained finite        #
+#          element method satisfying the discrete maximum principle for        #
+#          anisotropic diffusion problems on arbitrary meshes.                 #
+#          Ergebnisberichte des Instituts fuer Angewandte Mathematik, Nr. 373  #
+#                                                                              #
+################################################################################
+
+################################################################################
+# Configuration for all test problems
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = 0.0 ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 0.0 ; x,y,t
+deffunc: @velocity_y = 0.0 ; x,y,t
+
+################################################################################
+# Test problem no.1
+################################################################################
+
+# Definition of user-defined constants
+defconst: a11 = 100.0
+defconst: a12 = 0.0
+defconst: a21 = 0.0
+defconst: a22 = 0.1
+defconst: ang1 = 0.523598775598299
+
+# Definition of user-defined expressions
+defexpr: d1_11 = (COS(_ang1)*_a11-SIN(_ang1)*_a21)*COS(_ang1)-...
+                 (COS(_ang1)*_a12-SIN(_ang1)*_a22)*SIN(_ang1)
+defexpr: d1_12 = (COS(_ang1)*_a11-SIN(_ang1)*_a21)*SIN(_ang1)+...
+                 (COS(_ang1)*_a12-SIN(_ang1)*_a22)*COS(_ang1)
+defexpr: d1_21 = (SIN(_ang1)*_a11+COS(_ang1)*_a21)*COS(_ang1)-...
+                 (SIN(_ang1)*_a12+COS(_ang1)*_a22)*SIN(_ang1)
+defexpr: d1_22 = (SIN(_ang1)*_a11+COS(_ang1)*_a21)*SIN(_ang1)+...
+                 (SIN(_ang1)*_a12+COS(_ang1)*_a22)*COS(_ang1)
+
+# Specify the diffusion tensor
+deffunc: @diffusion1_11 = @d1_11 ; x,y,t
+deffunc: @diffusion1_12 = @d1_12 ; x,y,t
+deffunc: @diffusion1_21 = @d1_21 ; x,y,t
+deffunc: @diffusion1_22 = @d1_22 ; x,y,t
+
+# Sepcify the right-hand side
+deffunc: @rhs1 = 0.0 ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol1 = 0.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond1_primal]
+NBCT
+2
+NEXPR
+3
+IBCT
+1
+NCOMP
+1
+IBCT
+2
+NCOMP
+1
+PARAMETERS
+4.0  T  'DIRICHLET_WEAK'  '-1.0'  '1e2'  '1.0'
+4.0  T  'DIRICHLET_WEAK'  ' 1.0'  '1e2'  '1.0'
+
+
+################################################################################
+# Test problem no.2
+################################################################################
+
+# Definition of user-defined constants
+defconst: b11 = 1.0
+defconst: b12 = 0.0
+defconst: b21 = 0.0
+defconst: b22 = 1e-3
+defconst: ang2 = 1.17809724509617
+
+# Definition of user-defined expressions
+defexpr: d2_11 = (COS(_ang2)*_b11-SIN(_ang2)*_b21)*COS(_ang2)-...
+                 (COS(_ang2)*_b12-SIN(_ang2)*_b22)*SIN(_ang2)
+defexpr: d2_12 = (COS(_ang2)*_b11-SIN(_ang2)*_b21)*SIN(_ang2)+...
+                 (COS(_ang2)*_b12-SIN(_ang2)*_b22)*COS(_ang2)
+defexpr: d2_21 = (SIN(_ang2)*_b11+COS(_ang2)*_b21)*COS(_ang2)-...
+                 (SIN(_ang2)*_b12+COS(_ang2)*_b22)*SIN(_ang2)
+defexpr: d2_22 = (SIN(_ang2)*_b11+COS(_ang2)*_b21)*SIN(_ang2)+...
+                 (SIN(_ang2)*_b12+COS(_ang2)*_b22)*COS(_ang2)
+
+# Specify the diffusion tensor
+deffunc: @diffusion2_11 = @d2_11 ; x,y,t
+deffunc: @diffusion2_12 = @d2_12 ; x,y,t
+deffunc: @diffusion2_21 = @d2_21 ; x,y,t
+deffunc: @diffusion2_22 = @d2_22 ; x,y,t
+
+# Sepcify the right-hand side
+deffunc: @rhs2 = 0.0 ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol2 = 0.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond2_primal]
+NBCT
+3
+NEXPR
+3
+IBCT
+1
+NCOMP
+1
+IBCT
+2
+NCOMP
+1
+IBCT
+3
+NCOMP
+1
+PARAMETERS
+4.0  T  'HOMNEUMANN_WEAK' '0.0'
+4.0  T  'DIRICHLET_WEAK'  '0.0'  '1e2'  '1.0'
+4.0  T  'DIRICHLET_WEAK'  '1.0'  '1e2'  '1.0'
+
+
+################################################################################
+# Test problem no.3
+################################################################################
+
+# Specify the diffusion tensor
+deffunc: @diffusion3_11 = 100.0 ; x,y,t
+deffunc: @diffusion3_12 = 0.0   ; x,y,t
+deffunc: @diffusion3_21 = 0.0   ; x,y,t
+deffunc: @diffusion3_22 = 1.0   ; x,y,t
+
+# Specify the right-hand side
+deffunc: @rhs3 = 50.5*SIN(_PI*x)*SIN(_PI*y) ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol3 = SIN(_PI*x)*SIN(_PI*y)/(2*_PI^2) ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond3_primal]
+NBCT
+1
+NEXPR
+3
+IBCT
+1
+NCOMP
+1
+PARAMETERS
+4.0  T  'DIRICHLET_WEAK'  '0.0'  '1e2'  '1.0'
+
+
+################################################################################
+# Test problem no.4
+#
+# mild anisotropy K = [1.5 0.5; 0.5 1.5]
+# exact solution  u = 16x(1-x)y(1-y)
+# load vector     f = -nabla\cdot(K\nabla u)
+# boundary cond.  u = u_exact on the whole boundary
+################################################################################
+
+# Specify the diffusion tensor
+deffunc: @diffusion4_11 = 1.5 ; x,y,t
+deffunc: @diffusion4_12 = 0.5 ; x,y,t
+deffunc: @diffusion4_21 = 0.5 ; x,y,t
+deffunc: @diffusion4_22 = 1.5 ; x,y,t
+
+# Specify the right-hand side
+deffunc: @rhs4 = -48*(x^2+y^2)+80*(x+y)-64*x*y-16 ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol4 = 16*x*(1-x)*y*(1-y) ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond4_primal]
+NBCT
+1
+NEXPR
+3
+IBCT
+1
+NCOMP
+1
+PARAMETERS
+4.0  T  'DIRICHLET_WEAK'  '0.0'  '1e2'  '1.0'
+
+
+################################################################################
+# Test problem no.5
+#
+# mild anisotropy K = [1.5 0.5; 0.5 1.5]
+# exact solution  u = sin((1-x)(1-y))+(1-x)^3(1-y)^2
+# load vector     f = -nabla\cdot(K\nabla u)
+# boundary cond.  u = u_exact on the whole boundary
+################################################################################
+
+# Specify the diffusion tensor
+deffunc: @diffusion5_11 = 1.5 ; x,y,t
+deffunc: @diffusion5_12 = 0.5 ; x,y,t
+deffunc: @diffusion5_21 = 0.5 ; x,y,t
+deffunc: @diffusion5_22 = 1.5 ; x,y,t
+
+# Specify the right-hand side
+deffunc: @rhs5 = 1.5*sin((1-x)*(1-y))*(y-1)^2-9*(1-x)*(1-y)^2+...
+                    sin((1-x)*1-y)*(y-1)*(x-1)-cos((1-x)*(1-y))-...
+                    6*(1-x)^2*(1-y)+1.5*sin((1-x)*(1-y))*(x-1)^2-3*(1-x)^3 ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol5 = sin((1-x)*(1-y))+(1-x)^3*(1-y)^2 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond5_primal]
+NBCT
+1
+NEXPR
+3
+IBCT
+1
+NCOMP
+3
+PARAMETERS
+1.0  T  'DIRICHLET_WEAK'  'sin(1-y)+(1-y)^2'  '1e2'  '1.0' ; x,y,t
+2.0  T  'DIRICHLET_WEAK'  'sin(1-x)+(1-x)^3'  '1e2'  '1.0' ; x,y,t
+4.0  T  'DIRICHLET_WEAK'  '0.0'               '1e2'  '1.0'

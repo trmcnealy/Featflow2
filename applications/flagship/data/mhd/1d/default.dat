@@ -1,0 +1,71 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                                                                              #
+#               Default parameters for MHD application in 1D                   #
+#                                                                              #
+################################################################################
+
+sperfconfigfile = "../../perfconfig/default.pcfg"
+
+################################################################################
+[Mhd]
+################################################################################
+
+# Position of the discretisation in the array of discretisations
+Discretisation = 1
+
+# Position of the DOF coordinates in the block vector structure
+DofCoords = 1
+
+#-------------------------------------------------------------------------------
+
+# Position of the group finite element block for the inviscid term
+InviscidGFEM = 1
+
+# Position of the group finite element block for the viscous term
+ViscousGFEM = 2
+
+# Position of the template group finite element block
+TemplateGFEM = 3
+
+# Position of the group finite element block for the primal boundary
+PrimalBdrGFEM = 4
+
+# Position of the group finite element block for the dual boundary
+DualBdrGFEM = 5
+
+#-------------------------------------------------------------------------------
+# Position of the stabilisation for the inviscid term
+InviscidAFC = 1
+
+# Position of the stabilisation for the iviscous term
+ViscousAFC = 2
+
+# Position of the stabilisation for the mass term
+MassAFC = 3
+
+#-------------------------------------------------------------------------------
+
+# Position of the system matrix in the scalar matrix structure
+SystemMatrix = 1
+
+# Position of the Jacobian matrix in the scalar matrix structure
+JacobianMatrix = 2
+
+# Position of the template matrix in the scalar matrix structure
+TemplateMatrix = 3
+
+# Position of the consistent mass matrix in the scalar matrix structure
+ConsistentMassMatrix = 4
+
+# Position of the lumped mass matrix in the scalar matrix structure
+LumpedMassMatrix = 5
+
+# Position of the constant coefficient matrix CX in the scalar matrix structure
+CoeffMatrix_CX = 6
+
+# Position of the constant coefficient matrix CXX in the scalar matrix structure
+CoeffMatrix_CXX = 0 #7
+
+#-------------------------------------------------------------------------------

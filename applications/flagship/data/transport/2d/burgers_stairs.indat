@@ -1,0 +1,38 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                           Inviscid Burger's equation                         #
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = if( x>=0.1 & x<0.4, 1.0, if( x>=0.4 & x<=0.7, 0.5, 0.0)) ; x,y,t
+
+# Specify the exact solution
+deffunc: @exactsol = if (x <  0.1, 0.0, ...
+                     if (x-0.1 <=      y, (x-0.1)/y, ...
+                     if (x-0.4 <  0.75*y, 1.0, ...
+                     if (x-0.7 <= 0.25*y, 0.5, 0.0)))) ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 1.0 ; x,y,t
+deffunc: @velocity_y = 1.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+1
+IBCT
+1
+NCOMP
+6
+PARAMETERS
+1.0  T  'FLUX_WEAK'  0.0
+1.1  F  'FLUX_WEAK'  0.0
+1.4  F  'FLUX_WEAK'  1.0
+1.7  T  'FLUX_WEAK'  0.5
+2.0  T  'FLUX_WEAK'  0.0
+4.0  F  'FLUX_WEAK'  0.0

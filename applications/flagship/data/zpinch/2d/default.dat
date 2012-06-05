@@ -1,0 +1,37 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                                                                              #
+#             Default parameters for Z-pinch application                       #
+#                                                                              #
+################################################################################
+
+simportdatafiles = "../1d/default.dat"
+
+################################################################################
+[Hydro]
+################################################################################
+
+# Position of the constant coefficient matrix CY in the scalar matrix structure
+CoeffMatrix_CY = 6
+
+# Position of the constant coefficient matrix CYY in the scalar matrix structure
+CoeffMatrix_CYY = 0
+
+# Position of the constant coefficient matrix CXY in the scalar matrix structure
+CoeffMatrix_CXY = 0
+
+# Type of cubature rule used at the boundary
+ccubTypeBdr = 103
+
+################################################################################
+[Transport]
+################################################################################
+
+# Position of the constant coefficient matrix CY in the scalar matrix structure
+CoeffMatrix_CY = %{Hydro.CoeffMatrix_CY}
+
+# Type of cubature rule used at the boundary
+ccubTypeBdr = %{Hydro.ccubTypeBdr}
+
+#-------------------------------------------------------------------------------

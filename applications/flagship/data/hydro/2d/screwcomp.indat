@@ -1,0 +1,50 @@
+# -*- mode: any-ini; -*-
+#
+# Input data for screw-type compressor
+#
+# Initial conditions:
+# 
+# Density:                 compressible (ideal gas laW)
+# Dynamic viscosity:       nu = 1.82*10^5 kg/m s
+# Spec. heat capacity:     Cp = 1006.43 J/kg K
+# spec. heat conductivity: lambda = 0.0242 W/m K
+#
+# Inlet pressure:           p_in = 2 bar = 200,000 Pascal
+# Inlet temperature:        T_in = 300 K
+#
+# Outlet pressure:          p_out = 1 bar = 100,000 Pascal
+# Outlet temperature:       T_out = 300 K
+#
+# Primitive variables
+#
+# 1) Density from the ideal gas law: rho = p/(R T)
+#
+#    rho_in = 200,000[ N/m^]2/(287 [Nm/kg K] * 300 [K]) = 2.3228803716609 kg/m^3
+#
+
+#     2*10^5 N/m^2/(287 Nm/kg K * 300 K) = 2.3228804 kg/m^3
+# p   = 2*10^5 N/m^2
+# u=v = 0 (medium at rest)
+
+# Specify the initial solution
+deffunc: @initsol_rho  = 200000/287/300 ; x,y,t
+deffunc: @initsol_vel  = 0.0 ; x,y,t
+deffunc: @initsol_Etot = max(min(2.0,-0.05*x+1.5),1.0)/0.4 ; x,y,t
+
+# Specify the boundary conditions
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+4
+IBCT
+1
+NCOMP
+4
+PARAMETERS
+66.0  T  'FREESLIP_WEAK'
+67.0  F  'SUBOUTLET_WEAK'  '1.0'
+68.0  T  'FREESLIP_WEAK'
+69.0  F  'SUBINLET_WEAK'   '200000/287/300' ...
+      	 		   '2.0' ...
+			   '0.0'

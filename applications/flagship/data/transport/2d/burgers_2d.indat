@@ -1,0 +1,30 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                    Inviscid Burger's equation in 2D                          #
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = if( x <= 0.5 & y <= 0.5 | x >= 0.5 & y >= 0.5, 1.0, 0.0) ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 1.0 ; x,y,t
+deffunc: @velocity_y = 2.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+1
+IBCT
+1
+NCOMP
+4
+PARAMETERS
+1.0  T  'PERIODIC_WEAK'  1  4
+2.0  F  'PERIODIC_WEAK'  1  3
+3.0  T  'PERIODIC_WEAK'  1  2
+4.0  F  'PERIODIC_WEAK'  1  1
