@@ -1,0 +1,33 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                     Input parameters for the FEM-AFC solver                  #
+#                                                                              #
+#                    Inviscid Burger's equation in space-time                  #
+################################################################################
+
+# Specify the initial solution
+deffunc: @initsol = SIN(_PI*x) ; x,y,t
+
+# Specify the velocity field
+deffunc: @velocity_x = 1.0 ; x,y,t
+deffunc: @velocity_y = 1.0 ; x,y,t
+
+# Specify the diffusion coefficient
+deffunc: @diffusion = 0.0 ; x,y,t
+
+# Specify the boundary conditions for the primal problem
+[bdrcond_primal]
+NBCT
+1
+NEXPR
+3
+IBCT
+1
+NCOMP
+4
+PARAMETERS
+1.0  T  'PERIODIC_WEAK' 1 3
+2.0  F  'DIRICHLET_WEAK'  'SIN(_PI*x)'  '1e1'  '1.0' ; x,y,t
+3.0  F  'PERIODIC_WEAK' 1 1
+4.0  T  'HOMNEUMANN_WEAK'

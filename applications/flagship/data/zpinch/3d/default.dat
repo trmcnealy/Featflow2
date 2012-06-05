@@ -1,0 +1,46 @@
+# -*- mode: any-ini; -*-
+
+################################################################################
+#                                                                              #
+#             Default parameters for Z-pinch application                       #
+#                                                                              #
+################################################################################
+
+simportdatafiles = "../1d/default.dat"
+
+################################################################################
+[Hydro]
+################################################################################
+
+# Position of the constant coefficient matrix CY in the scalar matrix structure
+CoeffMatrix_CY = 6
+
+# Position of the constant coefficient matrix CZ in the scalar matrix structure
+CoeffMatrix_CY = 7
+
+# Position of the constant coefficient matrix CYY in the scalar matrix structure
+CoeffMatrix_CYY = 0
+
+# Position of the constant coefficient matrix CZZ in the scalar matrix structure
+CoeffMatrix_CZZ = 0
+
+# Position of the constant coefficient matrix CXY in the scalar matrix structure
+CoeffMatrix_CXY = 0
+
+# Position of the constant coefficient matrix CXZ in the scalar matrix structure
+CoeffMatrix_CXZ = 0
+
+# Position of the constant coefficient matrix CYZ in the scalar matrix structure
+CoeffMatrix_CYZ = 0
+
+################################################################################
+[Transport]
+################################################################################
+
+# Position of the constant coefficient matrix CY in the scalar matrix structure
+CoeffMatrix_CY = %{Hydro.CoeffMatrix_CY}
+
+# Position of the constant coefficient matrix CZ in the scalar matrix structure
+CoeffMatrix_CZ = %{Hydro.CoeffMatrix_CZ}
+
+#-------------------------------------------------------------------------------
