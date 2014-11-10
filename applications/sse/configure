@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# This small shell script is used to create a default makefile
+# for the application.
+#
+
+################################################################
+# Don't let the perl configure script be confused by non-english
+# messages from system information programs.
+# (LC_ALL overrides the value of the LANG environment variable
+# and the values of any other LC_* environment variables.)
+LC_ALL=C
+export LC_ALL
+
+# Admissible values for CASE_xxx are:
+# ALEX, WINANT, WALTERS, MARCHI
+
+../../bin/configure \
+    --appname=sse \
+    --programfile=src/sse.f90 \
+    --srclist_app="`ls src/*.f90`" \
+    --apponlyflags="-DCASE_POISSON_NEUMANN -DCASE_SSE_ALEX" \
+    "$@"
